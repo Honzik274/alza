@@ -14,6 +14,9 @@ public class HeaderContainer : BaseComponent
     private readonly Button CloseBasketButton = new(By.XPath("//button[@class='close-cart']"));
     private readonly Simple Title = new(By.XPath("//h1[@class='shop-title']"));
 
+    // NOVÉ tlačítko Checkout
+    private readonly Button CheckoutButton = new(By.XPath("//button[@class='checkout-button']"));
+
     /// <summary>
     /// Opens the basket container.
     /// </summary>
@@ -26,12 +29,6 @@ public class HeaderContainer : BaseComponent
         }
     }
 
-    /// <summary>
-    /// Clears all items from the basket.
-    /// </summary>
-    /// <returns>
-    /// The current basket count.
-    /// </returns>
     public int GetBasketCount()
     {
         if (BasketCount.IsNotDisplayed())
@@ -44,9 +41,6 @@ public class HeaderContainer : BaseComponent
                             throw new InvalidOperationException("Failed to parse basket count.");
     }
 
-    /// <summary>
-    /// Hide the basket container.
-    /// </summary>
     public void CloseBasketContainer()
     {
         if (BasketContainer.IsDisplayed())
@@ -56,10 +50,6 @@ public class HeaderContainer : BaseComponent
         }
     }
 
-    /// <summary>
-    /// Gets a list of product names currently in the basket.
-    /// </summary>
-    /// <returns>A list of product names.</returns>
     public List<string> GetProductNamesInBasket()
     {
         if (BasketContainer.IsNotDisplayed())
@@ -81,13 +71,6 @@ public class HeaderContainer : BaseComponent
         return productNames;
     }
 
-    /// <summary>
-    /// Gets the nth product in the basket.
-    /// </summary>
-    /// <param name="n">The index of the product to get (1-based).</param>
-    /// <param name="productName">The name of the product.</param>
-    /// <param name="productDetail">The detail of the product.</param>
-    /// <returns>True if the product was found, false otherwise.</returns>
     public bool GetNthProduct(int n, out string productName, out string productDetail)
     {
         productName = string.Empty;
@@ -110,9 +93,24 @@ public class HeaderContainer : BaseComponent
     }
 
     /// <summary>
-    /// Open the admin page
+    /// Clicks the Checkout button in the basket modal and returns CheckoutPage.
     /// </summary>
-    /// <returns>The Admin page</returns>
+    public CheckoutPage GoToCheckout()
+    {
+        // otevře modal, pokud není otevřený
+        if (BasketContainer.IsNotDisplayed())
+        {
+            OpenBasketButton.Click();
+            BasketContainer.WaitForDisplayed();
+        }
+
+        // klikne na Checkout button
+        CheckoutButton.Click();
+
+        // vrátí instanci CheckoutPage
+        return new CheckoutPage();
+    }
+
     public AdminPage OpenAdminPage()
     {
         WebDriver.WaitForUrlChanged(() => Title.Click());
